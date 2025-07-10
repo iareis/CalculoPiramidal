@@ -10,7 +10,6 @@ function exibirFormulario() {
   container.innerHTML = '';
   resultado.innerHTML = '';
 
-  // Aqui você vai adicionar os formulários de cada figura
   if (figura === "triangulo") {
     container.innerHTML = `
       <label>Lado A:</label><input type="number" id="a" />
@@ -19,8 +18,6 @@ function exibirFormulario() {
       <button onclick="calcularTriangulo()">Calcular</button>
     `;
   }
-
-  // Outras figuras vêm aqui (quadrado, retângulo etc.)
 }
 
 function calcularTriangulo() {
@@ -35,9 +32,11 @@ function calcularTriangulo() {
   document.getElementById("resultadoPlanas").innerHTML = `
     <p><strong>Área:</strong> ${area.toFixed(2)}</p>
     <p><strong>Perímetro:</strong> ${perimetro.toFixed(2)}</p>
-    <p><strong>Diagonais:</strong> 0 (triângulo não tem diagonais internas)</p>
+    <p><strong>Diagonais:</strong> 0 (triângulo não tem diagonais)</p>
   `;
 }
+
+// PIRÂMIDE ----------------------------
 
 function gerarBasePoligono() {
   const lados = parseInt(document.getElementById("ladosBase").value);
@@ -53,31 +52,106 @@ function gerarBasePoligono() {
   }
 
   container.innerHTML = `
-    <label>Área da base:</label><input type="number" id="areaBase" />
-    <label>Altura da pirâmide:</label><input type="number" id="altura" />
-    <button onclick="calcularPiramide(${lados})">Calcular</button>
+    <label>Os lados da base são todos iguais?</label>
+    <select id="ladosIguais" onchange="configurarLados(${lados})">
+      <option value="">--Selecione--</option>
+      <option value="sim">Sim</option>
+      <option value="nao">Não</option>
+    </select>
+    <div id="inputsLados"></div>
   `;
 }
 
-function calcularPiramide(lados) {
-  const areaBase = parseFloat(document.getElementById("areaBase").value);
-  const altura = parseFloat(document.getElementById("altura").value);
+function configurarLados(lados) {
+  const iguais = document.getElementById("ladosIguais").value;
+  const container = document.getElementById("inputsLados");
+  container.innerHTML = '';
+
+  if (iguais === "sim") {
+    container.innerHTML = `
+      <label>Comprimento do lado:</label>
+      <input type="number" id="ladoUnico" />
+      <label>Altura da pirâmide:</label>
+      <input type="number" id="alturaPiramide" />
+      <button onclick="calcularPiramideReg(${lados})">Calcular</button>
+    `;
+  } else if (iguais === "nao") {
+    let inputs = '';
+    for (let i = 1; i <= lados; i++) {
+      inputs += `<label>Lado ${i}:</label><input type="number" id="lado${i}" />`;
+    }
+    container.innerHTML = `
+      ${inputs}
+      <label>Altura da pirâmide:</label>
+      <input type="number" id="alturaPiramide" />
+      <button onclick="calcularPiramideIrreg(${lados})">Calcular</button>
+    `;
+  }
+}
+
+function calcularPiramideReg(lados) {
+  const lado = parseFloat(document.getElementById("ladoUnico").value);
+  const altura = parseFloat(document.getElementById("alturaPiramide").value);
+
+  const apotemaBase = lado / (2 * Math.tan(Math.PI / lados));
+  const areaBase = (lados * lado * apotemaBase) / 2;
+
   const volume = (areaBase * altura) / 3;
 
-  const nomePoligono = {
+  const alturaFace = Math.sqrt(altura ** 2 + apotemaBase ** 2);
+  const areaLateral = (lados * lado * alturaFace) / 2;
+
+  const areaTotal = areaBase + areaLateral;
+
+  const nomePoligono = obterNomePoligono(lados);
+
+  exibirResultadoPiramide(nomePoligono, areaBase, volume, areaTotal, altura);
+}
+
+function calcularPiramideIrreg(lados) {
+  let perimetro = 0;
+  const altura = parseFloat(document.getElementById("alturaPiramide").value);
+
+  for (let i = 1; i <= lados; i++) {
+    const lado = parseFloat(document.getElementById(`lado${i}`).value);
+    perimetro += lado;
+  }
+
+  const raioAprox = perimetro / (2 * Math.PI);
+  const areaBase = (perimetro * raioAprox) / 2;
+
+  const volume = (areaBase * altura) / 3;
+
+  const alturaFace = Math.sqrt(altura ** 2 + raioAprox ** 2);
+  const areaLateral = (perimetro * alturaFace) / 2;
+
+  const areaTotal = areaBase + areaLateral;
+
+  const nomePoligono = obterNomePoligono(lados);
+
+  exibirResultadoPiramide(nomePoligono + " irregular", areaBase, volume, areaTotal, altura);
+}
+
+function exibirResultadoPiramide(base, areaBase, volume, areaTotal, altura) {
+  document.getElementById("resultadoPiramide").innerHTML = `
+    <p><strong>Base:</strong> ${base}</p>
+    <p><strong>Área da base:</strong> ${areaBase.toFixed(2)}</p>
+    <p><strong>Altura:</strong> ${altura.toFixed(2)}</p>
+    <p><strong>Volume:</strong> ${volume.toFixed(2)}</p>
+    <p><strong>Área da superfície total:</strong> ${areaTotal.toFixed(2)}</p>
+  `;
+}
+
+function obterNomePoligono(lados) {
+  const nomes = {
     3: "Triângulo",
     4: "Quadrado",
     5: "Pentágono",
     6: "Hexágono",
     7: "Heptágono",
-    8: "Octógono"
-  }[lados] || `${lados}-lados`;
-
-  document.getElementById("resultadoPiramide").innerHTML = `
-    <p><strong>Base:</strong> ${nomePoligono}</p>
-    <p><strong>Área da Base:</strong> ${areaBase.toFixed(2)}</p>
-    <p><strong>Altura:</strong> ${altura.toFixed(2)}</p>
-    <p><strong>Volume:</strong> ${volume.toFixed(2)}</p>
-    <p><strong>Área da Superfície:</strong> (Cálculo detalhado opcional)</p>
-  `;
+    8: "Octógono",
+    9: "Eneágono",
+    10: "Decágono"
+  };
+  return nomes[lados] || `${lados}-lados`;
 }
