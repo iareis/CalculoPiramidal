@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora Geométrica</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Calculadora Geométrica</h1>
+  <div class="tabs">
+    <button onclick="showSection('planas')">Figuras Planas</button>
+    <button onclick="showSection('piramide')">Pirâmide</button>
+  </div>
+
+  <!-- Figuras Planas -->
+  <section id="planas" class="content-section">
+    <h2>Figuras Planas</h2>
+    <label for="figura">Escolha a figura:</label>
+    <select id="figura" onchange="exibirFormulario()">
+      <option value="">--Selecione--</option>
+      <option value="triangulo">Triângulo</option>
+      <option value="quadrado">Quadrado</option>
+      <option value="retangulo">Retângulo</option>
+      <option value="circulo">Círculo</option>
+      <option value="losango">Losango</option>
+      <option value="trapezio">Trapézio</option>
+      <option value="quadrilatero">Quadrilátero</option>
+    </select>
+    <div id="formularioPlanas"></div>
+    <div id="resultadoPlanas"></div>
+  </section>
+
+  <!-- Pirâmide -->
+  <section id="piramide" class="content-section" style="display: none;">
+    <h2>Pirâmide</h2>
+    <label for="ladosBase">Quantos lados tem a base da pirâmide?</label>
+    <input type="number" id="ladosBase" min="3" onchange="gerarBasePoligono()" />
+    <div id="formularioPiramide"></div>
+    <div id="resultadoPiramide"></div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
